@@ -19,3 +19,16 @@ Toolchain: Node 24.19.0, npm 11.9.0, Next 16.4.3, React 19.3.1, system Chromium 
 No live Core Web Vitals measurement, real engine build, commercial feature validation, website deployment, remote Git push or fresh-task snapshot restoration is claimed. The supplied career is fictional. Owner identity, contact, résumé, evidence, domain and public launch approval remain outstanding.
 
 Environment install_script and start_skill were saved as a configuration draft. Publishing the environment is a user action separate from deploying the website; running processes must be restarted after snapshot restoration.
+
+## Windows development compatibility update
+
+A user reported `next dev` (Turbopack) exiting silently after Ready in Windows PowerShell. The screenshot does not identify the native exit cause; a Windows reproduction and exit code were not available locally.
+
+- Default `npm run dev` now selects supported Webpack mode; `npm run dev:turbo` retains explicit access to Turbopack.
+- The new `npm run test:dev` launches the actual development command, compiles all twelve content routes, exercises hydrated traversal/quest controls, follows client navigation and confirms the server remains reachable. Passed on Linux with Chromium (1 test).
+- After these changes, typecheck, lint, all 8 unit tests and the production build passed.
+- Playwright uses a configured browser, available system Chromium, or its managed browser rather than assuming a Linux path on Windows.
+- Added GitHub Actions smoke coverage for Windows and Ubuntu on Node 24. Workflow definition is not itself proof of a passing Windows run.
+- The smoke configuration deliberately runs one desktop project; production desktop/mobile coverage remains in the separate `test:e2e` suite. An initial inherited mobile smoke project was interrupted because its desktop-only navigation locator could not match; the configuration was corrected and the dedicated smoke test passed.
+
+This update is a tested compiler-path workaround, not a claim that the exact Windows crash was reproduced or its root cause established. If Windows still exits, obtain Node version, terminal output and immediate PowerShell `$LASTEXITCODE` before further diagnosis.

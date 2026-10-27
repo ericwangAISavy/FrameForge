@@ -4,15 +4,29 @@ An editorial gameplay-engineering portfolio with original SVG environments, five
 
 ## Run
 
-Use Node 24 and npm 11 (validated versions: Node 24.19.0, npm 11.9.0).
+Use Node 24 LTS. The original cloud validation used Node 24.19.0 and npm 11.9.0; updating npm globally is not required. Run these commands from your checkout directory on Windows, macOS or Linux.
 
 ```sh
-cd /workspace/FrameForge
-npm ci --cache /workspace/.npm-cache
+npm ci
 npm run dev
 ```
 
 For production: `npm run build`, then `npm run start`. Both servers use port 3000. No database, API key, proprietary assets, external fonts, or game engine installation is required.
+
+## Development server compatibility
+
+`npm run dev` explicitly uses Webpack. A Windows report showed the default Turbopack process exiting silently immediately after startup; Webpack avoids that development compiler path. The screenshot alone does not establish the native exit cause, and Linux validation cannot prove that a Windows-specific crash is resolved. Turbopack remains available explicitly with `npm run dev:turbo`.
+
+Open **http://localhost:3000** in Chrome. `0.0.0.0` is a listening address, not the address to browse. Keep the terminal running. After pulling this compatibility update, stop any old dev server and clear only Next's generated cache if needed:
+
+```powershell
+git pull --ff-only
+npm ci
+if (Test-Path .next) { Remove-Item -Recurse -Force .next }
+npm run dev
+```
+
+Only one dev server can use this checkout at a time, even on different ports. Stop your own server before running the development smoke test. If it still exits, capture `node --version`, the terminal output, and `$LASTEXITCODE` immediately after the failure. An exit code is important when native code terminates without a JavaScript stack trace. Do not disable antivirus or TLS verification as a workaround.
 
 ## Checks
 
@@ -22,9 +36,12 @@ npm run typecheck
 npm run lint
 npm run build
 npm run test:e2e
+npm run test:dev
 ```
 
-Browser checks use the system Chromium at `/usr/bin/chromium`; set `CHROMIUM_PATH` to an installed Chromium executable elsewhere. Playwright starts the production server automatically, so build first. Desktop and touch-mobile projects cover every route, overflow, navigation, state transitions, quest persistence, memory reconstruction, server authority, and reduced motion. Retained failure traces are ignored by Git.
+Browser checks use `CHROMIUM_PATH` when set, an installed system Chromium on Linux when available, or Playwright’s managed Chromium on other systems. Install the managed browser with `npx playwright install chromium` on Windows/macOS or `npx playwright install --with-deps chromium` on Linux. Playwright starts the production server automatically, so build first. Desktop and touch-mobile projects cover every route, overflow, navigation, state transitions, quest persistence, memory reconstruction, server authority, and reduced motion. Retained failure traces are ignored by Git.
+
+`test:dev` starts the actual development command on port 3100 and exercises every content route, hydrated gameplay controls and client navigation. GitHub Actions runs this smoke test on Windows and Ubuntu with Node 24. The production browser suite and the dev smoke suite are separate.
 
 See `VALIDATION.md` for executed checks and their limits.
 
